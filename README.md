@@ -24,7 +24,7 @@
 - Подключен и используется `flutter_lint` (в pubspec.yaml и analysis_options.yaml)
 - Команда `flutter analyze` выполняется успешно без проблем
 
-### Визул приложения
+## Визул приложения
 ![main](./examples_inerface/main.jpg)
 ![swipe](./examples_inerface/swipe.jpg)
 ![likes_count](./examples_inerface/likes_count.jpg)
@@ -33,5 +33,5 @@
 ![detail2](./examples_inerface/detail2.jpg)
 ![profile](./examples_inerface/profile.jpg)
 
-#### Скачать .apk
+## Скачать .apk
 [Скачать здесь](https://disk.yandex.ru/d/yyIkJKR0Y0Djig)
