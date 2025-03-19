@@ -247,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
-    if (previousIndex > 7) {
+    if (previousIndex % 10 > 7) {
       _loadCats();
     }
 
