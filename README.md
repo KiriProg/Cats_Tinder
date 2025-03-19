@@ -24,7 +24,7 @@
 - Подключен и используется `flutter_lint` (в pubspec.yaml и analysis_options.yaml)
 - Команда `flutter analyze` выполняется успешно без проблем
 
-## Визул приложения
+## Визуал приложения
 ![main](./examples_inerface/main.jpg)
 ![swipe](./examples_inerface/swipe.jpg)
 ![likes_count](./examples_inerface/likes_count.jpg)
