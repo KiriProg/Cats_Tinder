@@ -34,4 +34,4 @@
 ![profile](./examples_inerface/profile.jpg)
 
 ## Скачать .apk
-[Скачать здесь](https://disk.yandex.ru/d/yyIkJKR0Y0Djig)
+[Скачать APK](https://github.com/KiriProg/Cats_Tinder/releases/latest/download/app-release.apk)
