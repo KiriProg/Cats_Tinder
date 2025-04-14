@@ -26,7 +26,7 @@
 - Управление состоянием через `Cubit` для всех экранов. 
 
 ## Визул приложения
-![[progress]](./examples_inerface/[progress].jpg)
+![progress](./examples_inerface/progress.jpg)
 ![swipe](./examples_inerface/swipe.jpg)
 ![liked](./examples_inerface/liked.jpg)
 ![filter](./examples_inerface/filter.jpg)
