@@ -6,6 +6,7 @@ class Cat {
   final String origin;
   final String lifeSpan;
   final String wikipediaUrl;
+  final DateTime likedDate;
 
   Cat({
     required this.imageUrl,
@@ -15,5 +16,16 @@ class Cat {
     required this.origin,
     required this.lifeSpan,
     required this.wikipediaUrl,
-  });
+    DateTime? likedDate,
+  }) : likedDate = likedDate ?? DateTime.now();
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Cat &&
+          runtimeType == other.runtimeType &&
+          imageUrl == other.imageUrl;
+
+  @override
+  int get hashCode => imageUrl.hashCode;
 }
