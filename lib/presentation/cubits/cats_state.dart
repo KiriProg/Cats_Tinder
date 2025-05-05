@@ -3,6 +3,8 @@ import '../../domain/entities/cat.dart';
 
 enum CatsStatus { initial, loading, success, error }
 
+enum NetworkStatus { online, offline }
+
 class CatsState extends Equatable {
   final List<Cat> cats;
   final List<Cat> likedCats;
@@ -11,6 +13,8 @@ class CatsState extends Equatable {
   final CatsStatus status;
   final String? errorMessage;
   final String favoriteBreed;
+  final NetworkStatus networkStatus;
+  final NetworkStatus? lastNetworkStatus;
 
   const CatsState({
     this.cats = const [],
@@ -20,6 +24,8 @@ class CatsState extends Equatable {
     this.status = CatsStatus.initial,
     this.errorMessage,
     required this.favoriteBreed,
+    this.networkStatus = NetworkStatus.online,
+    this.lastNetworkStatus,
   });
 
   factory CatsState.initial(String initialBreed) => CatsState(
@@ -39,6 +45,9 @@ class CatsState extends Equatable {
     CatsStatus? status,
     String? errorMessage,
     String? favoriteBreed,
+    NetworkStatus? networkStatus,
+    NetworkStatus? lastNetworkStatus,
+    bool? snackBarShown,
   }) {
     return CatsState(
       cats: cats ?? this.cats,
@@ -48,6 +57,8 @@ class CatsState extends Equatable {
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
       favoriteBreed: favoriteBreed ?? this.favoriteBreed,
+      networkStatus: networkStatus ?? this.networkStatus,
+      lastNetworkStatus: lastNetworkStatus ?? this.lastNetworkStatus,
     );
   }
 
@@ -59,5 +70,7 @@ class CatsState extends Equatable {
         totalSwipes,
         status,
         errorMessage,
+        networkStatus,
+        lastNetworkStatus,
       ];
 }

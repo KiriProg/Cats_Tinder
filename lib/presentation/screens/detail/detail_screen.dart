@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cats_tinder/domain/entities/cat.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -75,28 +76,15 @@ class DetailScreen extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: Image.network(
-          cat.imageUrl,
+        child: CachedNetworkImage(
+          imageUrl: cat.imageUrl,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => const Center(
-            child: Icon(
-              Icons.pets,
-              size: 80,
-              color: Colors.white,
-            ),
+          errorWidget: (context, url, error) => const Center(
+            child: Icon(Icons.pets, size: 80, color: Colors.white),
           ),
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Center(
-              child: CircularProgressIndicator(
-                value: loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
-                    : null,
-                color: Colors.white,
-              ),
-            );
-          },
+          placeholder: (context, url) => const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
         ),
       ),
     );

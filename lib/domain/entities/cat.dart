@@ -6,7 +6,7 @@ class Cat {
   final String origin;
   final String lifeSpan;
   final String wikipediaUrl;
-  final DateTime likedDate;
+  final DateTime? likedDate;
 
   Cat({
     required this.imageUrl,
@@ -16,8 +16,30 @@ class Cat {
     required this.origin,
     required this.lifeSpan,
     required this.wikipediaUrl,
+    this.likedDate,
+  });
+
+  Cat copyWith({
+    String? imageUrl,
+    String? breed,
+    String? description,
+    String? temperament,
+    String? origin,
+    String? lifeSpan,
+    String? wikipediaUrl,
     DateTime? likedDate,
-  }) : likedDate = likedDate ?? DateTime.now();
+  }) {
+    return Cat(
+      imageUrl: imageUrl ?? this.imageUrl,
+      breed: breed ?? this.breed,
+      description: description ?? this.description,
+      temperament: temperament ?? this.temperament,
+      origin: origin ?? this.origin,
+      lifeSpan: lifeSpan ?? this.lifeSpan,
+      wikipediaUrl: wikipediaUrl ?? this.wikipediaUrl,
+      likedDate: likedDate ?? this.likedDate,
+    );
+  }
 
   @override
   bool operator ==(Object other) =>

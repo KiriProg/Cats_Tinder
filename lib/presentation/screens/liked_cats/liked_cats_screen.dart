@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cats_tinder/presentation/cubits/cats_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cats_tinder/domain/entities/cat.dart';
 import 'package:cats_tinder/presentation/cubits/cats_cubit.dart';
+import 'package:intl/intl.dart';
 
 class LikedCatsScreen extends StatefulWidget {
   const LikedCatsScreen({Key? key}) : super(key: key);
@@ -18,7 +20,12 @@ class _LikedCatsScreenState extends State<LikedCatsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Liked Cats')),
+      appBar: AppBar(
+        title: const Text('Favorites', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.grey[900],
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: Container(
         decoration: _buildBackgroundDecoration(),
         child: BlocBuilder<CatsCubit, CatsState>(
@@ -32,7 +39,7 @@ class _LikedCatsScreenState extends State<LikedCatsScreen> {
                 Expanded(
                   child: filteredCats.isEmpty
                       ? _buildEmptyState(state.likedCats.isEmpty)
-                      : _buildCatList(filteredCats),
+                      : _buildCatGrid(filteredCats),
                 ),
               ],
             );
@@ -45,7 +52,7 @@ class _LikedCatsScreenState extends State<LikedCatsScreen> {
   BoxDecoration _buildBackgroundDecoration() {
     return BoxDecoration(
       gradient: LinearGradient(
-        colors: [Colors.black87, Colors.grey[900]!],
+        colors: [Colors.grey[850]!, Colors.grey[900]!],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),
@@ -55,37 +62,30 @@ class _LikedCatsScreenState extends State<LikedCatsScreen> {
   Widget _buildBreedFilter(List<String> breeds) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          const Text('Filter:', style: TextStyle(color: Colors.white)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[800],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: DropdownButton<String>(
-                value: _selectedBreed ?? "All breeds",
-                underline: Container(),
-                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                dropdownColor: Colors.grey[900],
-                style: const TextStyle(color: Colors.white),
-                isExpanded: true,
-                items: breeds.map((breed) {
-                  return DropdownMenuItem(
-                    value: breed,
-                    child: Text(breed),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() => _selectedBreed = newValue);
-                },
-              ),
-            ),
-          ),
-        ],
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[800],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[700]!),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: DropdownButton<String>(
+          value: _selectedBreed ?? "All breeds",
+          underline: Container(),
+          icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+          dropdownColor: Colors.grey[900],
+          style: const TextStyle(color: Colors.white),
+          isExpanded: true,
+          items: breeds.map((breed) {
+            return DropdownMenuItem(
+              value: breed,
+              child: Text(breed, style: const TextStyle(fontSize: 16)),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() => _selectedBreed = newValue);
+          },
+        ),
       ),
     );
   }
@@ -95,136 +95,182 @@ class _LikedCatsScreenState extends State<LikedCatsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.favorite_border, size: 60, color: Colors.white54),
+          Icon(Icons.favorite_border, size: 60, color: Colors.grey[600]),
           const SizedBox(height: 20),
           Text(
-            noLikes ? 'No likes yet' : 'No cats of selected breed',
-            style: const TextStyle(fontSize: 24, color: Colors.white54),
+            noLikes ? 'No favorites yet' : 'No cats of selected breed',
+            style: TextStyle(fontSize: 24, color: Colors.grey[500]),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            noLikes
+                ? 'Swipe right on cats to add them here'
+                : 'Try another breed filter',
+            style: TextStyle(color: Colors.grey[600]),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCatList(List<Cat> cats) {
-    return ListView.builder(
-      itemCount: cats.length,
-      itemBuilder: (context, index) {
-        final cat = cats[index];
-        return Dismissible(
-          key: Key('${cat.imageUrl}_$index'),
-          background: _buildDismissibleBackground(),
-          direction: DismissDirection.endToStart,
-          confirmDismiss: (_) => _confirmDismiss(context),
-          onDismissed: (_) => _removeCat(context, cat, index),
-          child: _buildCatListItem(context, cat, index),
-        );
-      },
+  Widget _buildCatGrid(List<Cat> cats) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 0.8,
+        ),
+        itemCount: cats.length,
+        itemBuilder: (context, index) {
+          final cat = cats[index];
+          return _buildCatCard(context, cat, index);
+        },
+      ),
     );
   }
 
-  Container _buildDismissibleBackground() {
-    return Container(
-      color: Colors.red,
-      alignment: Alignment.centerRight,
-      padding: const EdgeInsets.only(right: 20),
-      child: const Icon(Icons.delete, color: Colors.white),
+  Widget _buildCatCard(BuildContext context, Cat cat, int index) {
+    return GestureDetector(
+      onTap: () => _navigateToDetail(context, cat),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 4,
+        color: Colors.grey[800],
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(12)),
+                    child: CachedNetworkImage(
+                      imageUrl: cat.imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[700],
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey[700],
+                        child: const Icon(Icons.pets,
+                            size: 40, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        cat.breed,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        DateFormat('MMM d, y').format(cat.likedDate!),
+                        style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              bottom: 6,
+              right: 6,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.heart_broken,
+                      size: 25, color: Colors.white),
+                  onPressed: () => _removeCat(context, cat, index),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Future<bool?> _confirmDismiss(BuildContext context) {
-    return showDialog<bool>(
+  Future<bool?> _confirmDismiss(BuildContext context) async {
+    return await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Confirm"),
-        content: const Text("Delete this cat from favorites?"),
+        backgroundColor: Colors.grey[800],
+        title: const Text("Remove from favorites?",
+            style: TextStyle(color: Colors.white)),
+        content: const Text("This cat will be removed from your favorites.",
+            style: TextStyle(color: Colors.white70)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text("CANCEL"),
+            child:
+                const Text("CANCEL", style: TextStyle(color: Colors.white70)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("DELETE"),
+            child: const Text("REMOVE", style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
   }
 
-  Card _buildCatListItem(BuildContext context, Cat cat, int index) {
-    return Card(
-      margin: const EdgeInsets.all(8),
-      color: Colors.grey[800],
-      child: ListTile(
-        leading: _buildCatImage(cat),
-        title: Text(cat.breed, style: const TextStyle(color: Colors.white)),
-        subtitle: Text(
-          'Liked on: ${cat.likedDate.toString().split(' ')[0]}',
-          style: const TextStyle(color: Colors.white70),
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete, color: Colors.red),
-          onPressed: () => _removeCat(context, cat, index),
-        ),
-        onTap: () => _navigateToDetail(context, cat),
-      ),
-    );
-  }
+  void _removeCat(BuildContext context, Cat cat, int index) async {
+    final confirmed = await _confirmDismiss(context);
+    if (confirmed == true) {
+      try {
+        final filteredCats =
+            _filterCats(context.read<CatsCubit>().state.likedCats);
+        context.read<CatsCubit>().removeLikedCat(cat);
+        _showUndoSnackbar(context, cat);
+        _lastRemovedCat = cat;
 
-  Widget _buildCatImage(Cat cat) {
-    return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        color: Colors.grey[700],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Image.network(
-          cat.imageUrl,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, progress) {
-            if (progress == null) return child;
-            return const Center(
-                child: CircularProgressIndicator(
-              color: Colors.white,
-            ));
-          },
-          errorBuilder: (_, __, ___) => const Center(
-            child: Icon(
-              Icons.pets,
-              size: 40,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _removeCat(BuildContext context, Cat cat, int index) {
-    final filteredCats = _filterCats(context.read<CatsCubit>().state.likedCats);
-
-    context.read<CatsCubit>().removeLikedCat(cat);
-    _showUndoSnackbar(context, cat);
-    _lastRemovedCat = cat;
-
-    if (filteredCats.length == 1) {
-      setState(() {
-        _selectedBreed = null;
-      });
+        if (filteredCats.length == 1) {
+          setState(() {
+            _selectedBreed = null;
+          });
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
 
   void _showUndoSnackbar(BuildContext context, Cat cat) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${cat.breed} removed from favorites'),
+        content: Text('${cat.breed} removed'),
         duration: const Duration(seconds: 1),
         action: SnackBarAction(
           label: 'UNDO',
+          textColor: Colors.blueAccent,
           onPressed: () {
             if (_lastRemovedCat != null) {
               context.read<CatsCubit>().likeCat(_lastRemovedCat!);
@@ -232,6 +278,11 @@ class _LikedCatsScreenState extends State<LikedCatsScreen> {
             }
           },
         ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        backgroundColor: Colors.grey[800],
       ),
     );
   }

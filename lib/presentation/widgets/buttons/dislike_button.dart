@@ -12,9 +12,33 @@ class DislikeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.cancel, color: Colors.red, size: size),
-      onPressed: onPressed,
+    return Container(
+      width: 70,
+      height: 70,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.grey[900],
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black,
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        shape: const CircleBorder(),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(35),
+          child: const Icon(
+            Icons.close,
+            size: 36,
+            color: Colors.red,
+          ),
+        ),
+      ),
     );
   }
 }
