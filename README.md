@@ -43,7 +43,7 @@
 - Есть подвтерждение уведомления котика из лайкнутых. Если всё же котик по ошибке удалён, его можно вернуть с помощью всплывающей подсказки
 
 ## Визул приложения
-![main](./examples_inerface/mian.jpg)
+![main](./examples_inerface/main.jpg)
 ![swipe](./examples_inerface/swipe.jpg)
 ![liked](./examples_inerface/liked.jpg)
 ![filter](./examples_inerface/filter.jpg)
